@@ -15,7 +15,7 @@ build-type:          Simple
 -- extra-source-files:  
 cabal-version:       >=1.10
 
-executable DocGraph
+executable docgraph
   ghc-options:          -Wall
   hs-source-dirs:       src
   main-is:              Main.hs
