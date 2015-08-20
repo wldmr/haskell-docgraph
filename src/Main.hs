@@ -1,8 +1,11 @@
 module Main where
 
+import Data.Tree
 import System.Environment
 
 import DocGraph
+import DocGraph.IO
+import DocGraph.Types
 
 main :: IO ()
 main = do
