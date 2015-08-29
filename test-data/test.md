@@ -1,3 +1,5 @@
+% This thing is a title
+
 # Hey #
 
 This is a thing.

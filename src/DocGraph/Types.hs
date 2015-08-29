@@ -8,10 +8,10 @@ data Item = Item { itemLabel :: Label,
                    links :: [Link] }
 
 data LinkType = In | Out
-data Link = Link  { linkType :: LinkType,
-                    linkTarget :: Key,
-                    linkStyle :: Style,
-                    linkLabel :: Label }
+data Link = Link { linkType :: LinkType,
+                   linkTarget :: Key,
+                   linkStyle :: Style,
+                   linkLabel :: Label }
 
 type Style = String
 type Label = String
