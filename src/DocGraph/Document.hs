@@ -22,9 +22,18 @@ traverseDocumentIO path = do
 traverseDocument :: Pandoc -> DocGraph
 traverseDocument (Pandoc meta blocks) = Node { rootLabel = newItem title,
                                                subForest = forest }
-    where forest = unfoldForest traverseBlock blocks
-          title = stringify $ docTitle meta
+    where
+        title = stringify $ docTitle meta
+        forest = unfoldForest traverseElem (filter validElem elements)
+        elements = hierarchicalize blocks
 
-traverseBlock :: Block -> (Item, [Block])
-traverseBlock block = undefined
+traverseElem :: Element -> (Item, [Element])
+-- Reminder: Sec level nums attr heading subElems
+traverseElem (Sec _ _ _ heading subElems) = (item, subs)
+    where item = newItem (stringify heading)
+          subs = filter validElem subElems
+traverseElem _ = error "FUCK!"
 
+validElem :: Element -> Bool
+validElem (Sec _ _ _ _ _) = True
+validElem _               = False
