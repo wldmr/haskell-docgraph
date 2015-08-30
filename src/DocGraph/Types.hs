@@ -1,5 +1,6 @@
 module DocGraph.Types where
 
+import Data.List
 import Data.Tree
 
 data Item = Item { itemLabel :: Label,
@@ -29,4 +30,5 @@ addLink item link = item { links = link : links item }
 type DocGraph = Tree Item
 
 instance Show Item where
-    show = itemLabel
+    show itm = itemLabel itm ++ " (→ " ++ intercalate ", " ls ++ ")"
+        where ls = map linkTarget (links itm)
