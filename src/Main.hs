@@ -4,7 +4,6 @@ import Data.Tree
 import System.Environment
 
 import DocGraph
-import DocGraph.Document (traverseDocumentIO)
 
 main :: IO ()
 main = do

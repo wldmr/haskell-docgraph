@@ -1,16 +1,11 @@
 module DocGraph.Document where
 
-import Data.List
 import Data.Tree
 
 import DocGraph.Types
-import qualified DocGraph.Types as DT
 
 import Text.Pandoc
-import Text.Pandoc.Definition
-import qualified Text.Pandoc.Definition as PD
-import Text.Pandoc.Shared
-import Text.Pandoc.Walk
+import Text.Pandoc.Shared hiding (err)
 
 traverseDocumentIO :: FilePath -> IO DocGraph
 traverseDocumentIO path = do
