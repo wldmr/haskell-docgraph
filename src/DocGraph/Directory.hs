@@ -1,4 +1,4 @@
-module DocGraph.IO where
+module DocGraph.Directory where
 
 import Control.Monad
 import Data.Tree

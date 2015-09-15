@@ -4,7 +4,7 @@ import Data.Tree
 import System.Directory
 
 import DocGraph.Document
-import DocGraph.IO
+import DocGraph.Directory
 import DocGraph.Types
 
 traverseAllIO :: FilePath -> IO DocGraph
