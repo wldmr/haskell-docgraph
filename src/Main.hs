@@ -3,12 +3,13 @@ module Main where
 import Data.Tree
 import System.Environment
 
+import DocGraph
 import DocGraph.Document (traverseDocumentIO)
 
 main :: IO ()
 main = do
     args <- getArgs
-    tree <- traverseDocumentIO $ if null args
-                                    then "test-data/test.md"
+    tree <- traverseAllIO $ if null args
+                                    then "test-data"
                                     else head args
     putStr $ drawTree $ fmap show tree
