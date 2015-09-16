@@ -2,5 +2,10 @@ module DocGraph.Types where
 
 import Data.Tree
 
-type Item = String
+newtype Item = Item { itemLabel :: String }
+
+instance Show Item where
+    show = itemLabel
+
+
 type DocGraph = Tree Item

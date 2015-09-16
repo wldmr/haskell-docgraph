@@ -24,7 +24,7 @@ traverseDocument (Pandoc meta blocks) = unfoldTree traverseElem topElem
 
 traverseElem :: Element -> (Item, [Element])
 traverseElem (Sec _ _ _ heading subElems) = (item, subs)
-    where item = stringify heading
+    where item = Item (stringify heading)
           subs = filter isSec subElems
           -- Helper
           isSec (Sec _ _ _ _ _) = True
