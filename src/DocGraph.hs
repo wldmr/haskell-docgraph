@@ -25,5 +25,5 @@ contents (Directory path) = do (itm, paths) <- dirContents path
                                blocks <- sequence $ map getPathType paths
                                return (itm, blocks)
 contents (MarkdownFile path) = do doc <- traverseDocumentIO path
-                                  return (Item path, [DGraph doc])
+                                  return (newItem path, [DGraph doc])
 contents (DGraph dg) = return (rootLabel dg, map DGraph $ subForest dg)

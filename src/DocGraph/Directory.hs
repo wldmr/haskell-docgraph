@@ -13,7 +13,7 @@ traverseDirectory path = unfoldTreeM dirContents path
 
 dirContents :: FilePath -> IO (Item, [FilePath])
 dirContents path = do subitems <- ifM (doesDirectoryExist path) items noItems
-                      return (Item path, subitems)
+                      return (newItem path, subitems)
     where items = do paths <- getDirectoryContents path
                      let fullPaths = map (path </>) paths
                      filterM valid fullPaths

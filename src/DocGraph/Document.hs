@@ -1,5 +1,6 @@
 module DocGraph.Document where
 
+import Data.Maybe (catMaybes)
 import Data.Tree
 
 import DocGraph.Types
@@ -24,9 +25,13 @@ traverseDocument (Pandoc meta blocks) = unfoldTree traverseElem topElem
 
 traverseElem :: Element -> (Item, [Element])
 traverseElem (Sec _ _ _ heading subElems) = (item, subs)
-    where item = Item (stringify heading)
+    where item = newItem (stringify heading) `linkToAll` links
           subs = filter isSec subElems
+          links = catMaybes (map maybeLink subElems)
           -- Helper
           isSec (Sec _ _ _ _ _) = True
           isSec _               = False
+
+          maybeLink (Blk (Para [Str s])) = Just s
+          maybeLink _                    = Nothing
 traverseElem _ = error "FUCK!"
