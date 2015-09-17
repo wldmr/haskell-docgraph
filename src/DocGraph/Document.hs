@@ -1,37 +1,36 @@
 module DocGraph.Document where
 
-import Data.Maybe (catMaybes)
-import Data.Tree
+import Data.Either (rights)
+import qualified Data.Tree as DT
 
 import DocGraph.Types
 
-import Text.Pandoc
-import Text.Pandoc.Shared hiding (err)
+import Text.Parsec
 
 traverseDocumentIO :: FilePath -> IO DocGraph
 traverseDocumentIO path = do
-    string <- readFile path
-    let result = readMarkdown def string
-    case result of
-        Left err -> error $ show err
-        Right doc -> return $ traverseDocument doc
+    contents <- readFile path
+    let forest = map toTree $ tokenize contents
+    return $ DT.Node (newItem path) forest
+  where
+    toTree t = DT.Node (newItem $ show t) []
 
-traverseDocument :: Pandoc -> DocGraph
-traverseDocument (Pandoc meta blocks) = unfoldTree traverseElem topElem
-    where
-        elements = hierarchicalize blocks
-        topElem = Sec 0 [] nullAttr (docTitle meta) elements
-        -- Reminder: Sec level nums attr heading subElems
+data Token = TNode Int String
 
-traverseElem :: Element -> (Item, [Element])
-traverseElem (Sec _ _ _ heading subElems) = (item, subs)
-    where item = newItem (stringify heading) `linkToAll` links
-          subs = filter isSec subElems
-          links = catMaybes (map maybeLink subElems)
-          -- Helper
-          isSec (Sec _ _ _ _ _) = True
-          isSec _               = False
+instance Show Token where
+    show (TNode level label) = "("++show level++") " ++ label
 
-          maybeLink (Blk (Para [Str s])) = Just s
-          maybeLink _                    = Nothing
-traverseElem _ = error "FUCK!"
+tokenize :: String -> [Token]
+tokenize s = rights $ map (parse' node) (lines s)
+
+type Parser = Parsec String ()
+
+parse' :: Parser a -> String -> Either ParseError a
+parse' p = parse p ""
+
+node :: Parser Token
+node = do hs <- many1 (char '#')
+          skipMany space
+          s <- many1 (noneOf "#\n")
+          let lvl = length hs
+          return $ TNode lvl s
