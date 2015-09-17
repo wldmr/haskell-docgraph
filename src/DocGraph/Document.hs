@@ -5,7 +5,7 @@ import qualified Data.Tree as DT
 
 import DocGraph.Types
 
-import Text.Parsec
+import Text.Parsec hiding (token)
 
 traverseDocumentIO :: FilePath -> IO DocGraph
 traverseDocumentIO path = do
@@ -16,12 +16,12 @@ traverseDocumentIO path = do
     toTree t = DT.Node (newItem $ show t) []
 
 data Token = TNode Int String
-
-instance Show Token where
-    show (TNode level label) = "("++show level++") " ++ label
+           | TLink String
+           deriving (Show)
 
 tokenize :: String -> [Token]
-tokenize s = rights $ map (parse' node) (lines s)
+tokenize s = rights $ map (parse' tok) (lines s)
+    where tok = choice [node, link]
 
 type Parser = Parsec String ()
 
@@ -34,3 +34,9 @@ node = do hs <- many1 (char '#')
           s <- many1 (noneOf "#\n")
           let lvl = length hs
           return $ TNode lvl s
+
+link :: Parser Token
+link = do string "->"
+          skipMany space
+          s <- manyTill anyChar eof
+          return $ TLink s
