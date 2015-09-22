@@ -1,5 +1,7 @@
 module DocGraph where
 
+import Data.Char (isLetter)
+import Data.List
 import Data.Tree
 import System.Directory
 
@@ -27,3 +29,17 @@ contents (Directory path) = do (itm, paths) <- dirContents path
 contents (MarkdownFile path) = do doc <- traverseDocumentIO path
                                   contents (DGraph doc)
 contents (DGraph dg) = return (rootLabel dg, map DGraph $ subForest dg)
+
+
+toDotGraph :: DocGraph -> String
+toDotGraph (Node (Item s ls) subs) = "digraph {\n" ++ subnodes ++ "\n}"
+    where subnodes = intercalate "\n" (map toDot subs)
+
+toDot :: DocGraph -> String
+toDot (Node (Item s ls) []) = "\""++s++"\";\n"
+toDot (Node (Item s ls) subs) = "subgraph cluster_"++clean s++" {\n"
+                              ++ "label=\""++s++"\"\n"
+                              ++ subnodes
+                              ++ "\n}"
+    where subnodes = intercalate "\n" (map toDot subs)
+          clean = filter isLetter
