@@ -40,11 +40,22 @@ link = do string "->"
 
 itemize :: [Token] -> [(Int, Item)]
 itemize [] = []
-itemize (TNode l s : ts) = (l, newItem s) : itemize ts'
-    where (_, ts') = break atNode ts
-          -- TODO: Do something useful with the first part.
+itemize (TNode l s : ts) = (l, itm) : itemize ts'
+    where (subs, ts') = break atNode ts
+
+          itm = newItem s `linkToAll` links
+          links = map asStr $ filter isLink subs
+
           atNode (TNode {}) = True
           atNode _          = False
+
+          isLink (TLink {}) = True
+          isLink _          = False
+
+          asStr (TLink s') = s'
+          asStr _ = error "asStr should only be called on TLinks"
+itemize (TLink {}:_) = error "TLink encountered. Should have been filtered out."
+
 
 build :: [(Int, Item)] -> [DocGraph]
 build [] = []
