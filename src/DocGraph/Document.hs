@@ -10,10 +10,7 @@ import Text.Parsec hiding (token)
 traverseDocumentIO :: FilePath -> IO DocGraph
 traverseDocumentIO path = do
     contents <- readFile path
-    let forest = map toTree $ tokenize contents
-    return $ DT.Node (newItem path) forest
-  where
-    toTree t = DT.Node (newItem $ show t) []
+    return $ DT.Node (newItem path) (build $ itemize $ tokenize contents)
 
 data Token = TNode Int String
            | TLink String
@@ -40,3 +37,16 @@ link = do string "->"
           skipMany space
           s <- manyTill anyChar eof
           return $ TLink s
+
+itemize :: [Token] -> [(Int, Item)]
+itemize [] = []
+itemize (TNode l s : ts) = (l, newItem s) : itemize ts'
+    where (_, ts') = break atNode ts
+          -- TODO: Do something useful with the first part.
+          atNode (TNode {}) = True
+          atNode _          = False
+
+build :: [(Int, Item)] -> [DocGraph]
+build [] = []
+build ((n, itm):rest) = (DT.Node itm (build children)) : build siblings
+    where (children, siblings) = span ((>n).fst) rest
