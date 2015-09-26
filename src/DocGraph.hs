@@ -1,11 +1,11 @@
 module DocGraph where
 
-import Data.Char (isLetter)
-import Data.List
+import Data.Char (isAlphaNum)
 import Data.Tree
 import System.Directory
 
 import DocGraph.Document
+import qualified DocGraph.Dot as D
 import DocGraph.Directory
 import DocGraph.Types
 
@@ -30,16 +30,18 @@ contents (MarkdownFile path) = do doc <- traverseDocumentIO path
                                   contents (DGraph doc)
 contents (DGraph dg) = return (rootLabel dg, map DGraph $ subForest dg)
 
+graph2dot :: DocGraph -> D.Graph
+graph2dot g = (fmap toNode g, edges g)
+    where
+        toNode :: Item -> D.Node
+        toNode i = (toID (itemLabel i), [])
 
-toDotGraph :: DocGraph -> String
-toDotGraph (Node (Item s ls) subs) = "digraph {\n" ++ subnodes ++ "\n}"
-    where subnodes = intercalate "\n" (map toDot subs)
+        edges :: DocGraph -> [D.Edge]
+        edges (Node _ []) = []
+        edges (Node i subs) = es ++ concat (map edges subs)
+            where es = map toEdge (itemLinks i)
+                  toEdge l = (s, toID (show l), [])
+                  s = toID $ itemLabel $ i
 
-toDot :: DocGraph -> String
-toDot (Node (Item s ls) []) = "\""++s++"\";\n"
-toDot (Node (Item s ls) subs) = "subgraph cluster_"++clean s++" {\n"
-                              ++ "label=\""++s++"\"\n"
-                              ++ subnodes
-                              ++ "\n}"
-    where subnodes = intercalate "\n" (map toDot subs)
-          clean = filter isLetter
+toID :: String -> String
+toID = filter isAlphaNum

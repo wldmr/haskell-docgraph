@@ -12,6 +12,6 @@ main = do
                                     then "test-data"
                                     else head args
     putStr $ drawTree $ fmap show tree
-    let dot = toDotGraph tree
+    let dot = show (graph2dot tree)
     writeFile "test.dot" dot
     putStr dot

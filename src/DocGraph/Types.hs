@@ -27,3 +27,5 @@ linkToAll :: Item -> [String] -> Item
 linkToAll = foldl linkTo
 
 type DocGraph = Tree Item
+
+
