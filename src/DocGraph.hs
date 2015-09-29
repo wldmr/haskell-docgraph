@@ -1,11 +1,11 @@
 module DocGraph where
 
-import Data.Char (isAlphaNum)
+import Control.Monad
 import Data.Tree
 import System.Directory
+import Text.Dot
 
 import DocGraph.Document
-import qualified DocGraph.Dot as D
 import DocGraph.Directory
 import DocGraph.Types
 
@@ -30,18 +30,15 @@ contents (MarkdownFile path) = do doc <- traverseDocumentIO path
                                   contents (DGraph doc)
 contents (DGraph dg) = return (rootLabel dg, map DGraph $ subForest dg)
 
-graph2dot :: DocGraph -> D.Graph
-graph2dot g = (fmap toNode g, edges g)
-    where
-        toNode :: Item -> D.Node
-        toNode i = (toID (itemLabel i), [])
+graph2dot :: DocGraph -> String
+graph2dot g = showDot $ graph2dot' g
 
-        edges :: DocGraph -> [D.Edge]
-        edges (Node _ []) = []
-        edges (Node i subs) = es ++ concat (map edges subs)
-            where es = map toEdge (itemLinks i)
-                  toEdge l = (s, toID (show l), [])
-                  s = toID $ itemLabel $ i
-
-toID :: String -> String
-toID = filter isAlphaNum
+graph2dot' :: DocGraph -> Dot ()
+graph2dot' (Node (Item s _) []) = do
+    Text.Dot.node $ [ ("label", s) ]
+    return ()
+graph2dot' (Node (Item s _) ns) = do
+    cluster $ do
+        attribute ("label", s)
+        forM_ ns graph2dot'
+    return ()

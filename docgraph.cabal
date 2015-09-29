@@ -25,6 +25,7 @@ executable docgraph
                         containers,
                         directory,
                         filepath,
-                        parsec
+                        parsec,
+                        dotgen
   -- hs-source-dirs:      
   default-language:    Haskell2010
