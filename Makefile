@@ -1,4 +1,4 @@
-SOURCES=$(wildcard src/**/*.hs)
+SOURCES=$(shell find src -name '*.hs')
 
 test.pdf: test.dot
 
@@ -6,4 +6,5 @@ test.pdf: test.dot
 	dot -Tpdf -o$@ $<
 
 test.dot: $(SOURCES)
+	echo $(SOURCES)
 	cabal run
