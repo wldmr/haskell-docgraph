@@ -12,7 +12,7 @@ instance Show Item where
 
 type Label = String
 
-newtype Link = Link String
+newtype Link = Link { linkTarget :: String }
 
 instance Show Link where
     show (Link s) = s
