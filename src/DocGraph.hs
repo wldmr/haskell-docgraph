@@ -55,14 +55,16 @@ graph2dot g = showDot $ do attribute ("compound", "true")
             (cid, (cnid, subNodes)) <- cluster $ do
                 attribute ("label", s)
                 attribute ("style", "rounded")
-                cnid <- Text.Dot.node [ ("shape", "point"),
-                                        ("style", "invis"),
-                                        ("fixedsize", "true"),
-                                        ("height", "0"),
-                                        ("width", "0") ]
                 subs <- forM ns dotClusters
-                return (cnid, concat subs)
+                let subs' = concat subs
+                    NodeAddress firstNode = findNode subs'
+                return (firstNode, subs')
             return $ (itm, ClusterAddress cid cnid) : subNodes
+
+        findNode = map infoAddress >>> filter isNode >>> head
+
+        isNode NodeAddress {} = True
+        isNode _              = False
 
         idMapping :: [NodeInfo] -> [(String, NodeInfo)]
         idMapping = map mkAssoc
