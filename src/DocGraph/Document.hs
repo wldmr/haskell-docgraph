@@ -1,6 +1,9 @@
 module DocGraph.Document where
 
+import Control.Arrow ((>>>))
+import Data.Char (isSpace)
 import Data.Either (rights)
+import Data.List (dropWhile, dropWhileEnd)
 import qualified Data.Tree as DT
 
 import DocGraph.Types
@@ -20,6 +23,9 @@ tokenize :: String -> [Token]
 tokenize s = rights $ map (parse' tok) (lines s)
     where tok = choice [node, link]
 
+strip :: Label -> Label
+strip = dropWhile isSpace >>> dropWhileEnd isSpace
+
 type Parser = Parsec String ()
 
 parse' :: Parser a -> String -> Either ParseError a
@@ -30,13 +36,13 @@ node = do hs <- many1 (char '#')
           skipMany space
           s <- many1 (noneOf "#\n")
           let lvl = length hs
-          return $ TNode lvl s
+          return $ TNode lvl (strip s)
 
 link :: Parser Token
 link = do string "->"
           skipMany space
           s <- manyTill anyChar eof
-          return $ TLink s
+          return $ TLink (strip s)
 
 itemize :: [Token] -> [(Int, Item)]
 itemize [] = []

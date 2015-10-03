@@ -2,7 +2,7 @@
 
 # Hey #
 
--> Hey 2 
+-> Hey 2
 
 This is a [thing](Blarg the Elder). This is a link to [Hey 2]().
 
